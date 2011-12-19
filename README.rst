@@ -25,4 +25,9 @@ TODO
 * Switch to using libclang.dylib rather that a static link of
   everything. This involves starting to correctly use rpath
   stuff on OS X.
+* When walking AST, it is not visiting the right stuff now.
+* When walking the AST, need to be able to return the right
+  value.
+* Need to wrap a bunch of stuff for the cursor to get back data
+  about what is being walked.
 * Support the rest of the API as needed.
