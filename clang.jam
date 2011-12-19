@@ -1,0 +1,3 @@
+CCFLAGS += `llvm-config --cflags` ;
+CCFLAGS += -I`llvm-config --src-root`/tools/clang/include ;
+LINKFLAGS += `llvm-config --ldflags` ;
