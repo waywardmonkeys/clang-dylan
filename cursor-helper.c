@@ -11,3 +11,19 @@ void* dylan_clang_getTranslationUnitCursor(CXTranslationUnit tu)
   return buffer;
 }
 
+unsigned dylan_clang_visitChildren(void* cursorBuffer,
+                                   CXCursorVisitor visitor,
+                                   CXClientData client_data)
+{
+  CXCursor cursor = *(CXCursor *)cursorBuffer;
+  return clang_visitChildren(cursor, visitor, client_data);
+}
+
+enum CXChildVisitResult dylan_clang_cursor_visitor(CXCursor cursor,
+                                                   CXCursor parent,
+                                                   CXClientData client_data)
+{
+  dylan_clang_invoke_visit_callback(&cursor, &parent, client_data);
+  return CXChildVisit_Continue;
+}
+

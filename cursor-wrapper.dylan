@@ -16,7 +16,7 @@ define c-function %clang-get-translation-unit-cursor
 end;
 
 define c-function %dylan-clang-dispose-cursor-buffer
-  parameter cursor :: <%clang-cursor-buffer>;
+  parameter buffer :: <%clang-cursor-buffer>;
   c-name: "free";
 end;
 
@@ -41,3 +41,37 @@ define method clang-get-translation-unit-cursor(tu :: <clang-translation-unit>) 
   let buffer :: <%clang-cursor-buffer> = %clang-get-translation-unit-cursor(tu.%raw);
   make(<clang-cursor>, raw: buffer);
 end;
+
+define method %dylan-clang-invoke-visit-callback
+    (cursor-buffer :: <%clang-cursor-buffer>,
+     parent-cursor-buffer :: <%clang-cursor-buffer>,
+     data :: <c-dylan-object>)
+ => ()
+  let visitor = import-c-dylan-object(data);
+  if (visitor)
+    apply(visitor, cursor-buffer, parent-cursor-buffer);
+  end;
+end;
+
+define c-callable-wrapper %invoke-visit-callback of %dylan-clang-invoke-visit-callback
+  parameter cursor-buffer :: <%clang-cursor-buffer>;
+  parameter parent-cursor-buffer :: <%clang-cursor-buffer>;
+  parameter data :: <c-dylan-object>;
+  c-name: "dylan_clang_invoke_visit_callback";
+end;
+
+define c-function %clang-visit-children
+  parameter buffer :: <%clang-cursor-buffer>;
+  parameter callback :: <c-function-pointer>;
+  parameter data :: <c-dylan-object>;
+  result xxx :: <c-unsigned-int>;
+  c-name: "dylan_clang_visitChildren";
+end;
+
+define method clang-visit-children(cursor :: <clang-cursor>, visitor :: <function>)
+  register-c-dylan-object(visitor);
+  let visitor-handle = export-c-dylan-object(visitor);
+  %clang-visit-children(cursor.%raw, %invoke-visit-callback, visitor-handle);
+  unregister-c-dylan-object(visitor);
+end;
+

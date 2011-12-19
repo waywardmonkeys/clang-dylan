@@ -2,7 +2,7 @@ module: clang
 
 define c-subtype <%clang-translation-unit> (<c-void*>) end;
 
-define c-function %clang-create-translation-unit
+define c-function %clang-create-translation-unit-from-source-file
   parameter index :: <%clang-index>;
   parameter filename :: <c-string>;
   parameter num-clang-command-line-args :: <c-int>;
@@ -10,7 +10,7 @@ define c-function %clang-create-translation-unit
   parameter num-unsaved-files :: <c-int>;
   parameter unsaved-files :: <c-void*>;
   result tu :: <%clang-translation-unit>;
-  c-name: "clang_createTranslationUnit";
+  c-name: "clang_createTranslationUnitFromSourceFile";
 end;
 
 define c-function %clang-dispose-translation-unit
@@ -29,7 +29,7 @@ define sealed domain initialize(singleton(<clang-translation-unit>));
 
 define method initialize(tu :: <clang-translation-unit>, #key index :: <clang-index>, filename :: <string>) => ()
   next-method();
-  tu.%raw := %clang-create-translation-unit(index.%raw, filename, 0, null-pointer(<c-void*>), 0, null-pointer(<c-void*>));
+  tu.%raw := %clang-create-translation-unit-from-source-file(index.%raw, filename, 0, null-pointer(<c-void*>), 0, null-pointer(<c-void*>));
   finalize-when-unreachable(tu);
 end;
 
